@@ -70,7 +70,7 @@ export class AuthClient extends WebApiClient implements AccessDataProvider {
         super.fillHeader(header);
 
         AHeaderDecorator.INSTANCE.fillHeader(header);
-        
+
         if (this.accessData) this.fillSessionHeader(header);
     }
 
@@ -121,15 +121,6 @@ export class AuthClient extends WebApiClient implements AccessDataProvider {
         return form;
     }
 
-    protected createAutologinForm(email: string, token: string, locked: boolean, permanent?: boolean, forced?: boolean): LoginForm {
-        let form = this.createLoginForm(email, token, permanent, forced);
-
-        form['auto_login'] = true;
-        form['autowithlock'] = locked;
-
-        return form;
-    }
-
     protected createRegisterForm(passcode: string, email: string, password: string, permanent: boolean, forced?: boolean): LoginForm {
         let form = this.createLoginForm(email, password, permanent, forced);
 
@@ -143,16 +134,6 @@ export class AuthClient extends WebApiClient implements AccessDataProvider {
         this.currentLogin = this.login.bind(this, email, password, forced);
 
         let form = this.createLoginForm(email, password, undefined, forced);
-
-        let xvc = this.calculateXVCKey(BasicHeaderDecorator.INSTANCE.UserAgent, email);
-        this.loginAccessData(await this.requestMapped<LoginAccessDataStruct>('POST', AuthClient.getAccountApiPath('login.json'), LoginAccessDataStruct.MAPPER, form, { 'X-VC': xvc }));
-    }
-
-    async loginToken(email: string, token: string, forced: boolean = false, locked: boolean = true) {
-        this.accessData = null;
-        this.currentLogin = this.loginToken.bind(this, email, token, forced);
-
-        let form = this.createAutologinForm(email, token, locked, undefined, forced);
 
         let xvc = this.calculateXVCKey(BasicHeaderDecorator.INSTANCE.UserAgent, email);
         this.loginAccessData(await this.requestMapped<LoginAccessDataStruct>('POST', AuthClient.getAccountApiPath('login.json'), LoginAccessDataStruct.MAPPER, form, { 'X-VC': xvc }));
@@ -195,7 +176,7 @@ export class AuthClient extends WebApiClient implements AccessDataProvider {
     }
 
     calculateFullXVCKey(userAgent: string, email: string): string {
-        let res = `HEATH|${userAgent}|DEMIAN|${email}|${this.deviceUUID}`;
+        let res = `SIMON|${userAgent}|EDWARD|${email}|${this.deviceUUID}`;
 
         let hash = crypto.createHash('sha512');
 

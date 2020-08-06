@@ -51,7 +51,6 @@ export interface ApiClient {
     readonly Logon: boolean;
 
     login(email: string, password: string, forced?: boolean): Promise<void>;
-    loginToken(email: string, token: string, forced?: boolean, locked?: boolean): Promise<void>;
 
     relogin(): Promise<void>;
 
@@ -92,7 +91,7 @@ export class TalkApiClient extends EventEmitter {
 
     private channelBoard: ChannelBoardClient;
     private openChannelBoard: OpenChannelBoardClient;
-    
+
     constructor(name: string, deviceUUID: string) {
         super();
 
@@ -145,14 +144,6 @@ export class TalkApiClient extends EventEmitter {
         }
 
         await this.auth.login(email, password, forced);
-    }
-
-    async loginToken(email: string, token: string, forced: boolean = false, locked: boolean = false) {
-        if (this.Logon) {
-            throw new Error('Already logon');
-        }
-
-        await this.auth.loginToken(email, token, forced, locked);
     }
 
     async relogin() {
@@ -233,15 +224,6 @@ export class TalkClient extends TalkApiClient implements LocoClient {
         await this.locoLogin();
     }
 
-    async loginToken(email: string, token: string, forced: boolean = false, locked: boolean = false) {
-        if (this.LocoLogon) {
-            throw new Error('Already logon to loco');
-        }
-
-        await super.loginToken(email, token, forced, locked);
-        await this.locoLogin();
-    }
-
     async relogin() {
         await super.relogin();
 
@@ -287,7 +269,7 @@ export class TalkClient extends TalkApiClient implements LocoClient {
 
     logout() {
         super.logout();
-        
+
         this.networkManager.disconnect();
     }
 
@@ -342,7 +324,7 @@ export class TalkClientChatUser extends EventEmitter implements ClientChatUser {
 export class TalkClientUserInfo implements ClientUserInfo {
 
     constructor(private user: TalkClientChatUser, private settings: MoreSettingsStruct) {
-        
+
     }
 
     get Client() {
